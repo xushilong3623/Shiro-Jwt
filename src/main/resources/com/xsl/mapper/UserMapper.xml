@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.xsl.mapper.UserMapper">
+
+    <resultMap id="RoleInfo" type="com.xsl.bean.Role">
+        <result property="id" column="id"/>
+        <result property="roleName" column="rolename"/>
+        <result property="remark" column="remark"/>
+        <collection property="permissions" column="id" select="getRolePermission"></collection>
+    </resultMap>
+
+    <resultMap id="PermissionInfo" type="com.xsl.bean.Permission">
+        <result property="id" column="id"/>
+        <result property="remark" column="remark"/>
+        <result property="name" column="name"/>
+        <result property="sign" column="sign"/>
+        <association property="module" javaType="com.xsl.bean.Module" select="getPermissionModuleInfo" column="moduleid"></association>
+    </resultMap>
+
+    <select id="getRolesByUserId" resultMap="RoleInfo">
+        SELECT role.id,role.rolename,role.remark FROM userrole LEFT JOIN role
+        ON userrole.roleid=role.id WHERE userrole.userid=#{id}
+    </select>
+
+    <select id="getRolePermission" resultMap="PermissionInfo">
+        SELECT permission.* FROM rolepermission LEFT JOIN permission ON rolepermission.permissionid=permission.id
+        WHERE rolepermission.roleid=#{id}
+    </select>
+
+    <select id="getPermissionModuleInfo" resultType="com.xsl.bean.Module">
+        SELECT id,remark,name,sign,parentid AS parentId FROM module WHERE id=#{moduleid}
+    </select>
+</mapper>
